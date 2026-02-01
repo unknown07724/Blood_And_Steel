@@ -14,6 +14,9 @@ fetch('provinces.json')
       if (province.svg_path) { // only render if path exists
         Render(province.svg_path);
       }
+      if (!province.svg_path) { // only render if path exists
+        console.error("No Path for " + province.name);
+      }
     });
   })
   .catch(error => {
