@@ -1,8 +1,8 @@
-const board = document.getElementById('board');
-const ctx = board.getContext('2d');
+window.board = document.getElementById('board');
+window.ctx = window.board.getContext('2d'); 
 
-board.width = window.innerWidth;
-board.height = window.innerHeight;
+window.board.width = window.innerWidth;
+window.board.height = window.innerHeight;
 
 fetch('provinces.json')
   .then(response => {
@@ -14,13 +14,13 @@ fetch('provinces.json')
       if (province.svg_path) { // only render if path exists
         Render(province.svg_path);
       }
-      if (!province.svg_path) { // only render if path exists
-        console.error("No Path for " + province.name);
+      if (!province.svg_path) {
+        console.warn("No Path for " + province.name + ", it won't be shown or interacted with.");
       }
     });
   })
   .catch(error => {
-    console.error('Fetch failed:', error);
+    console.error('Request failed:', error);
   });
 
 function Render(pathData) {
