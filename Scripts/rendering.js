@@ -3,6 +3,7 @@ window.ctx = window.board.getContext('2d');
 
 window.board.width = window.innerWidth;
 window.board.height = window.innerHeight;
+board.focus();   // focus the board so most of logic.js works
 
 fetch('provinces.json')
   .then(response => {
