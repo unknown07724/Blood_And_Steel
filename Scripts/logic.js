@@ -1,4 +1,4 @@
-window.language = 'de';
+window.language = 'en';
 
 diplomacymenu = `
 <div class="diplomacy_menu" style="position:fixed; top:0; left:0; background:rgba(90,90,90,255); color:white; padding:10px; border-radius:2px;">
