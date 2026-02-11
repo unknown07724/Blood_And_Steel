@@ -1,7 +1,8 @@
-window.language = 'en';
+window.language = 'de';
 
 diplomacymenu = `
 <div class="diplomacy_menu" style="position:fixed; top:0; left:0; background:rgba(90,90,90,255); color:white; padding:10px; border-radius:2px;">
+    <img src="Assets/Sprites/Flags/Starting Nations/Prussia/Nonaligned.svg" alt="Flag of {$name}" style="width: 20%; height: 20%; border: 4px ridge #505050;">
     <p>{$name}</p>
     <button onclick="alert('Declared War on {$name}')">war</button>
     <button onclick="">peace</button>
@@ -12,11 +13,14 @@ let activeDiplomacyMenu = null;
 let hoveredProvince = null;
 let langDict = {}; // holds translations
 
-// --- Load lang ---
+// --- Load the language ---
 fetch(`languages/${window.language}.lang`)
   .then(r => r.text())
   .then(text => {
     langDict = parseLang(text);
+    if (langDict['title']) {
+        document.title = langDict['title']; //
+    }
   });
 
 // --- Lang parser ---
@@ -25,7 +29,7 @@ function parseLang(langString) {
     const lines = langString.split('\n');
     for (let line of lines) {
         line = line.trim();
-        if (!line || line.startsWith('#')) continue;
+        if (!line || line.startsWith('#') || line.startsWith('[')) continue;
         const [key, value] = line.split('=').map(s => s.trim());
         if (key && value) dict[key] = value;
     }
@@ -88,3 +92,15 @@ fetch('provinces.json')
         }
     });
   });
+
+
+
+
+
+
+
+
+  // Functions
+  function square(x){
+    return x * x;
+  }
