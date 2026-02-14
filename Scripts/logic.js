@@ -2,7 +2,7 @@ window.language = 'en';
 
 diplomacymenu = `
 <div class="diplomacy_menu" style="position:fixed; top:0; left:0; background:rgba(90,90,90,255); color:white; padding:10px; border-radius:2px;">
-    <img src="Assets/Sprites/Flags/Starting Nations/Prussia/Nonaligned.svg" alt="Flag of {$name}" style="width: 20%; height: 20%; border: 4px ridge #505050;">
+    <img src="Assets/Sprites/Flags/Starting Nations/{$name}/Nonaligned.svg" alt="Flag of {$name}" style="width: 20%; height: 20%; border: 4px ridge #505050;">
     <p>{$name}</p>
     <button onclick="alert('Declared War on {$name}')">war</button>
     <button onclick="">peace</button>
@@ -54,14 +54,28 @@ function diplomacy(nation) {
         div.innerHTML = translateString(diplomacymenu, langDict);
         activeDiplomacyMenu = div.firstElementChild;
         document.body.appendChild(activeDiplomacyMenu);
+        window.activeDiplomacyMenu.height = window.innerHeight;
+
     }
 
     // update the name dynamically per province
     activeDiplomacyMenu.querySelector('p').textContent = nation;
+
+    // update the war button
     activeDiplomacyMenu.querySelector('button').onclick = () => {
         alert('Declared War on ' + nation);
     };
+
+    // update the peace button if you want it dynamic
+    activeDiplomacyMenu.querySelectorAll('button')[1].onclick = () => {
+        alert('Offered Peace to ' + nation);
+    };
+
+    // ✅ update the flag image dynamically
+    activeDiplomacyMenu.querySelector('img').src =
+        `Assets/Sprites/Flags/Starting Nations/${nation}/Nonaligned.svg`;
 }
+
 
 window.diplomacy = diplomacy;
 
@@ -93,14 +107,7 @@ fetch('provinces.json')
     });
   });
 
-
-
-
-
-
-
-
-  // Functions
+  // Math
   function square(x){
     return x * x;
   }
