@@ -46,10 +46,6 @@ fetch(`languages/${window.language}.lang`)
         document.title = langDict['title'];
     }
 
-    if (langDict['lang']) {
-        document.documentElement.lang = langDict['lang'];
-    }
-
 
     // Create menu AFTER translations are ready
     const tempDiv = document.createElement('div');
