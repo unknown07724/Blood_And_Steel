@@ -1,29 +1,20 @@
 window.language = 'en';
 
 diplomacymenu = `
-<div class="diplomacy_menu" style="position:fixed; top:0; left:0; background:rgba(90,90,90,255); color:white; padding:10px; border-radius:2px;">
+<div class="diplomacy_menu" style="position:fixed; top:0; left:0; background:rgba(90,90,90,1); color:white; padding:10px; border-radius:2px;">
     <img src="Assets/Sprites/Flags/Starting Nations/{$name}/Nonaligned.svg" alt="Flag of {$name}" style="width: 20%; height: 20%; border: 4px ridge #505050;">
     <p>{$name}</p>
     <button onclick="alert('Declared War on {$name}')">war</button>
     <button onclick="">peace</button>
-</div>
-`;
+</div>`;
 
 let activeDiplomacyMenu = null;
 let hoveredProvince = null;
 let langDict = {}; // holds translations
 
-// --- Load the language ---
-fetch(`languages/${window.language}.lang`)
-  .then(r => r.text())
-  .then(text => {
-    langDict = parseLang(text);
-    if (langDict['title']) {
-        document.title = langDict['title']; //
-    }
-  });
+let flagImg, nameP, warBtn, peaceBtn;
 
-// --- Lang parser ---
+// --- Parses Languages ---
 function parseLang(langString) {
     const dict = {};
     const lines = langString.split('\n');
@@ -46,36 +37,47 @@ function translateString(str, dict) {
     return translated;
 }
 
-// --- Diplomacy menu toggle ---
-function diplomacy(nation) {
-    if (!activeDiplomacyMenu) {
-        // first time: create the menu
-        const div = document.createElement('div');
-        div.innerHTML = translateString(diplomacymenu, langDict);
-        activeDiplomacyMenu = div.firstElementChild;
-        document.body.appendChild(activeDiplomacyMenu);
-        window.activeDiplomacyMenu.height = window.innerHeight;
-
+// --- Load the language and create menu ---
+fetch(`languages/${window.language}.lang`)
+  .then(r => r.text())
+  .then(text => {
+    langDict = parseLang(text);
+    if (langDict['title']) {
+        document.title = langDict['title'];
     }
 
-    // update the name dynamically per province
-    activeDiplomacyMenu.querySelector('p').textContent = nation;
+    if (langDict['lang']) {
+        document.documentElement.lang = langDict['lang'];
+    }
 
-    // update the war button
-    activeDiplomacyMenu.querySelector('button').onclick = () => {
-        alert('Declared War on ' + nation);
-    };
 
-    // update the peace button if you want it dynamic
-    activeDiplomacyMenu.querySelectorAll('button')[1].onclick = () => {
-        alert('Offered Peace to ' + nation);
-    };
+    // Create menu AFTER translations are ready
+    const tempDiv = document.createElement('div');
+    tempDiv.innerHTML = translateString(diplomacymenu, langDict);
+    activeDiplomacyMenu = tempDiv.firstElementChild;
+    document.body.appendChild(activeDiplomacyMenu);
+    activeDiplomacyMenu.style.display = 'none'; // hide by default
 
-    // ✅ update the flag image dynamically
-    activeDiplomacyMenu.querySelector('img').src =
-        `Assets/Sprites/Flags/Starting Nations/${nation}/Nonaligned.svg`;
+    // grab elements inside for easy updates
+    flagImg = activeDiplomacyMenu.querySelector('img');
+    nameP = activeDiplomacyMenu.querySelector('p');
+    warBtn = activeDiplomacyMenu.querySelectorAll('button')[0];
+    peaceBtn = activeDiplomacyMenu.querySelectorAll('button')[1];
+  });
+
+// --- Diplomacy toggle/update ---
+function diplomacy(nation) {
+    if (!activeDiplomacyMenu) return; // safety check
+
+    nameP.textContent = nation;
+    flagImg.src = `Assets/Sprites/Flags/Starting Nations/${nation}/Nonaligned.svg`;
+
+    // update buttons dynamically
+    warBtn.onclick = () => alert('Declared War on ' + nation);
+    peaceBtn.onclick = () => alert('Offered Peace to ' + nation);
+
+    activeDiplomacyMenu.style.display = 'block';
 }
-
 
 window.diplomacy = diplomacy;
 
@@ -85,6 +87,7 @@ fetch('provinces.json')
   .then(provinces => {
     const paths = provinces.map(p => ({
         name: p.name,
+        owner: p.owner,
         path: new Path2D(p.svg_path)
     }));
 
@@ -94,7 +97,7 @@ fetch('provinces.json')
         hoveredProvince = null;
         for (const p of paths) {
             if (ctx.isPointInPath(p.path, x, y)) {
-                hoveredProvince = p.name;
+                hoveredProvince = p.owner;
                 break;
             }
         }
@@ -107,7 +110,7 @@ fetch('provinces.json')
     });
   });
 
-  // Math
-  function square(x){
+// --- Math helper ---
+function square(x){
     return x * x;
-  }
+}

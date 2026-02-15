@@ -1,28 +1,33 @@
 window.board = document.getElementById('board');
-window.ctx = window.board.getContext('2d'); 
+window.ctx = window.board.getContext('2d');
 
 window.board.width = window.innerWidth;
 window.board.height = window.innerHeight;
-board.focus();   // focus the board so most of logic.js works
+board.focus();
 
-fetch('provinces.json')
-  .then(response => {
-    if (!response.ok) throw new Error('Network Error');
-    return response.json();
-  })
-  .then(provinces => {
-    provinces.forEach(province => {
-      if (province.svg_path) { // only render if path exists
-        Render(province.svg_path);
-      }
-      if (!province.svg_path) {
-        console.warn("No Path for " + province.name + ", it won't be shown or interacted with.");
-      }
-    });
-  })
-  .catch(error => {
-    console.error('Request failed:', error);
-  });
+  fetch('provinces.json')
+    .then(response => {
+      if (!response.ok) throw new Error('Network Error');
+      return response.json();
+    })
+    .then(provinces => {
+      // build paths array with Path2D objects
+      window.paths = provinces
+        .filter(p => p.svg_path) // only provinces with paths
+        .map(p => ({
+          name: p.name,
+          owner: p.owner,
+          path: Render(p.svg_path)
+        }));
+
+      // warn for missing paths
+      provinces.forEach(p => {
+        if (!p.svg_path) {
+          console.warn("No Path for " + p.name + ", it won't be shown or interacted with.");
+        }
+      });
+    })
+    .catch(error => console.error('Request failed:', error));
 
 function Render(pathData) {
   const path = new Path2D(pathData);
@@ -30,4 +35,5 @@ function Render(pathData) {
   ctx.strokeStyle = 'white';
   ctx.fill(path);
   ctx.stroke(path);
+  return path; // return for paths array
 }

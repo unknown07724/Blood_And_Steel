@@ -3,5 +3,7 @@ war = Declare War
 peace = Peace
 nation = Nation
 division = Division
+
 [document metadata]
 title = Blood And Steel
+lang = en
