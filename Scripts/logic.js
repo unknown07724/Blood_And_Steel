@@ -1,5 +1,12 @@
 window.language = 'en';
 
+window.player = {
+    ID: "prussia",
+    diplomacy: {
+        saxony: "neutral",
+    }
+}
+
 diplomacymenu = `
 <div class="diplomacy_menu" style="position:fixed; top:0; left:0; background:rgba(90,90,90,1); color:white; padding:10px; border-radius:2px;">
     <img src="Assets/Sprites/Flags/Starting Nations/{$name}/Nonaligned.svg" alt="Flag of {$name}" style="width: 20%; height: 20%; border: 4px ridge #505050;">
@@ -53,6 +60,7 @@ fetch(`languages/${window.language}.lang`)
     activeDiplomacyMenu = tempDiv.firstElementChild;
     document.body.appendChild(activeDiplomacyMenu);
     activeDiplomacyMenu.style.display = 'none'; // hide by default
+    activeDiplomacyMenu.innerHeight = window.innerHeight;
 
     // grab elements inside for easy updates
     flagImg = activeDiplomacyMenu.querySelector('img');
@@ -61,7 +69,6 @@ fetch(`languages/${window.language}.lang`)
     peaceBtn = activeDiplomacyMenu.querySelectorAll('button')[1];
   });
 
-// --- Diplomacy toggle/update ---
 function diplomacy(nation) {
     if (!activeDiplomacyMenu) return; // safety check
 
@@ -69,8 +76,15 @@ function diplomacy(nation) {
     flagImg.src = `Assets/Sprites/Flags/Starting Nations/${nation}/Nonaligned.svg`;
 
     // update buttons dynamically
-    warBtn.onclick = () => alert('Declared War on ' + nation);
-    peaceBtn.onclick = () => alert('Offered Peace to ' + nation);
+    warBtn.onclick = () => {
+        player.diplomacy[nation.toLowerCase()] = "war";
+        console.log(player.ID + " declared war on " + nation);
+    };
+    peaceBtn.onclick = () => {
+        if (Math.random() < 0.5) {
+            player.diplomacy[nation.toLowerCase()] = "neutral";
+        }
+    };
 
     activeDiplomacyMenu.style.display = 'block';
 }
@@ -106,7 +120,7 @@ fetch('provinces.json')
     });
   });
 
-// --- Math helper ---
+// --- Math ---
 function square(x){
     return x * x;
 }
