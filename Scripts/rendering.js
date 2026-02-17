@@ -17,7 +17,8 @@ board.focus();
         .map(p => ({
           name: p.name,
           owner: p.owner,
-          path: Render(p.svg_path)
+          color: getNationData(p.owner)?.color || 'darkgray',
+          path: Render(p.svg_path, getNationData(p.owner)?.color || 'darkgray')
         }));
 
       // warn for missing paths
@@ -29,9 +30,9 @@ board.focus();
     })
     .catch(error => console.error('Request failed:', error));
 
-function Render(pathData) {
+function Render(pathData, color) {
   const path = new Path2D(pathData);
-  ctx.fillStyle = 'darkgray';
+  ctx.fillStyle = color;
   ctx.strokeStyle = 'white';
   ctx.fill(path);
   ctx.stroke(path);

@@ -1,11 +1,24 @@
 window.language = 'en';
 
 window.player = {
-    ID: "prussia",
-    diplomacy: {
-        saxony: "neutral",
-    }
+    ID: "Prussia",
+    diplomacy: {}
 }
+
+window.nation = [
+{
+    name: "Bavaria",
+    ideology: "Monarchist",
+    color: "#2fc4b0",
+    diplomacy: {}
+},
+{
+    name: "Saxony",
+    ideology: "Monarchist",
+    color: "#40b45b",
+    diplomacy: {}
+}
+]
 
 diplomacymenu = `
 <div class="diplomacy_menu" style="position:fixed; top:0; left:0; background:rgba(90,90,90,1); color:white; padding:10px; border-radius:2px;">
@@ -69,25 +82,38 @@ fetch(`languages/${window.language}.lang`)
     peaceBtn = activeDiplomacyMenu.querySelectorAll('button')[1];
   });
 
-function diplomacy(nation) {
-    if (!activeDiplomacyMenu) return; // safety check
+  function getNationData(name) {
+    return window.nation.find(n => n.name.toLowerCase() === name.toLowerCase());
+}
 
-    nameP.textContent = nation;
-    flagImg.src = `Assets/Sprites/Flags/Starting Nations/${nation}/Nonaligned.svg`;
 
-    // update buttons dynamically
+function diplomacy(nationName) {
+    if (!activeDiplomacyMenu) return;
+
+    let data = getNationData(nationName);
+
+    nameP.textContent = nationName;
+
+    if (data) {
+        flagImg.src = `Assets/Sprites/Flags/Starting Nations/${nationName}/${data.ideology}.svg`;
+    } else {
+        flagImg.src = `Assets/Sprites/Flags/Starting Nations/${nationName}/Nonaligned.svg`;
+    }
+
     warBtn.onclick = () => {
-        player.diplomacy[nation.toLowerCase()] = "war";
-        console.log(player.ID + " declared war on " + nation);
+        window.player.diplomacy[nationName.toLowerCase()] = "war";
+        console.log(window.player.ID + " declared war on " + nationName);
     };
+
     peaceBtn.onclick = () => {
-        if (Math.random() < 0.5) {
-            player.diplomacy[nation.toLowerCase()] = "neutral";
+        if (Math.random() < 0.5 && window.player.diplomacy[nationName.toLowerCase()] === "war") {
+            window.player.diplomacy[nationName.toLowerCase()] = "neutral";
         }
     };
 
-    activeDiplomacyMenu.style.display = 'block';
+    activeDiplomacyMenu.style.display = "block";
 }
+
 
 window.diplomacy = diplomacy;
 
@@ -98,7 +124,8 @@ fetch('provinces.json')
     const paths = provinces.map(p => ({
         name: p.name,
         owner: p.owner,
-        path: new Path2D(p.svg_path)
+        path: new Path2D(p.svg_path),
+        color: getNationData(p.owner)?.color || 'darkgray'
     }));
 
     board.addEventListener('mousemove', e => {
