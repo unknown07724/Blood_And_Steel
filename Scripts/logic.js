@@ -17,6 +17,12 @@ window.nation = [
     ideology: "Monarchist",
     color: "#40b45b",
     diplomacy: {}
+},
+{
+    name: "Netherlands",
+    ideology: "Monarchist",
+    color: "#705a3e",
+    diplomacy: {}
 }
 ]
 
