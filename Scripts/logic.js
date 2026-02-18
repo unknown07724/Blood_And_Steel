@@ -134,17 +134,20 @@ fetch('provinces.json')
         color: getNationData(p.owner)?.color || 'darkgray'
     }));
 
-    board.addEventListener('mousemove', e => {
-        const x = e.offsetX;
-        const y = e.offsetY;
-        hoveredProvince = null;
-        for (const p of paths) {
-            if (ctx.isPointInPath(p.path, x, y)) {
-                hoveredProvince = p.owner;
-                break;
-            }
+board.addEventListener('mousemove', e => {
+    // convert mouse to map coordinates
+    const mouseX = (e.offsetX - board.width/2)/camera.zoom + camera.x;
+    const mouseY = (e.offsetY - board.height/2)/camera.zoom + camera.y;
+
+    hoveredProvince = null;
+    for (const p of paths) {
+        if (ctx.isPointInPath(p.path, mouseX, mouseY)) {
+            hoveredProvince = p.owner;
+            break;
         }
-    });
+    }
+});
+
 
     document.addEventListener('keydown', e => {
         if (e.key === 'e' && hoveredProvince) {

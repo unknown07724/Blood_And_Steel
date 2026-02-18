@@ -26,11 +26,10 @@ fetch('provinces.json')
   })
   .catch(err => console.error(err));
 
-  camera.x = isNaN(camera.x) ? 0 : camera.x;
-  camera.y = isNaN(camera.y) ? 0 : camera.y;
-  camera.zoom = isNaN(camera.zoom) ? 100 : camera.zoom;
-
-
+  camera.x = Number(camera.x) || 0;
+  camera.y = Number(camera.y) || 0;
+  camera.zoom = Number(camera.zoom) || 100;
+  
 // ----- camera auto-fit -----
 function fitCameraToPaths() {
 
@@ -76,6 +75,7 @@ function drawMap() {
     const path = new Path2D(p.pathData);
     ctx.fillStyle = p.color;
     ctx.fill(path);
+    ctx.lineWidth = 0.5 / camera.zoom; // keep stroke width consistent
     ctx.strokeStyle = 'white';
     ctx.stroke(path);
 
