@@ -7,34 +7,45 @@ board.height = window.innerHeight;
 let paths = [];
 let camera = { x: 0, y: 0, zoom: 100 };
 
+camera.x = isNaN(camera.x) ? 0 : camera.x;
+camera.y = isNaN(camera.y) ? 0 : camera.y;
+camera.zoom = isNaN(camera.zoom) ? 100 : camera.zoom;
 
+// ----- getNationData safe check -----
+function getNationData(name) {
+  if (!window.nations) return null;
+  return window.nations.find(n => n.name.toLowerCase() === name.toLowerCase());
+}
 
-// fetch provinces JSON
-fetch('provinces.json')
-  .then(res => res.json())
-  .then(provinces => {
-    // store pathData + color
-    
-    paths = provinces.map(p => ({
-      pathData: p.svg_path,
-      color: getNationData(p.owner)?.color || 'darkgray'
-    }));
+// ----- try mapping provinces only once nations exist -----
+function tryMapColors() {
+  if (!window.nations) {
+    // nations not loaded yet, try again in 10ms
+    setTimeout(tryMapColors, 10);
+    return;
+  }
 
-    // auto-fit camera at start
-    fitCameraToPaths();
-    drawMap();
-  })
-  .catch(err => console.error(err));
+  // nations exist, fetch provinces
+  fetch('provinces.json')
+    .then(res => res.json())
+    .then(provinces => {
+      paths = provinces.map(p => ({
+        pathData: p.svg_path,
+        owner: p.owner,
+        color: getNationData(p.owner)?.color || 'darkgray'
+      }));
 
-  camera.x = Number(camera.x) || 0;
-  camera.y = Number(camera.y) || 0;
-  camera.zoom = Number(camera.zoom) || 100;
-  
+      fitCameraToPaths();
+      drawMap();
+    })
+    .catch(err => console.error(err));
+}
+
+// start the polling
+tryMapColors();
+
 // ----- camera auto-fit -----
 function fitCameraToPaths() {
-
-
-
   if (paths.length === 0) return;
 
   let minX = Infinity, maxX = -Infinity, minY = Infinity, maxY = -Infinity;
@@ -45,16 +56,14 @@ function fitCameraToPaths() {
     for (let i = 0; i < nums.length; i += 2) {
       minX = Math.min(minX, nums[i]);
       maxX = Math.max(maxX, nums[i]);
-      minY = Math.min(minY, nums[i+1]);
-      maxY = Math.max(maxY, nums[i+1]);
+      minY = Math.min(minY, nums[i + 1]);
+      maxY = Math.max(maxY, nums[i + 1]);
     }
   });
 
-  // center camera
   camera.x = (minX + maxX) / 2;
   camera.y = (minY + maxY) / 2;
 
-  // zoom to fit
   const scaleX = board.width / (maxX - minX);
   const scaleY = board.height / (maxY - minY);
   camera.zoom = Math.min(scaleX, scaleY) * 0.9;
@@ -68,14 +77,17 @@ function drawMap() {
     if (!p.pathData) return;
     ctx.save();
 
-    // apply camera: move to center and adjust for pan/zoom
-    ctx.translate(board.width / 2 - camera.x * camera.zoom, board.height / 2 - camera.y * camera.zoom);
+    ctx.translate(
+      board.width / 2 - camera.x * camera.zoom,
+      board.height / 2 - camera.y * camera.zoom
+    );
     ctx.scale(camera.zoom, camera.zoom);
 
     const path = new Path2D(p.pathData);
     ctx.fillStyle = p.color;
     ctx.fill(path);
-    ctx.lineWidth = 0.5 / camera.zoom; // keep stroke width consistent
+
+    ctx.lineWidth = 0.5 / camera.zoom;
     ctx.strokeStyle = 'white';
     ctx.stroke(path);
 
@@ -85,7 +97,7 @@ function drawMap() {
 
 // ----- pan camera with arrow keys -----
 document.addEventListener('keydown', e => {
-  const speed = 20 / camera.zoom; // adjust speed to zoom level
+  const speed = 20 / camera.zoom;
 
   if (e.key === 'ArrowUp') camera.y -= speed;
   if (e.key === 'ArrowDown') camera.y += speed;
@@ -98,8 +110,11 @@ document.addEventListener('keydown', e => {
 // ----- zoom with mouse wheel -----
 document.addEventListener('wheel', e => {
   const zoomFactor = 1 - e.deltaY * 0.001;
-  camera.zoom *= zoomFactor; 
-  camera.zoom = Math.min(Math.max(camera.zoom, 0.05), 10); // clamp to safe range
+  camera.zoom *= zoomFactor;
+  camera.zoom = Math.min(Math.max(camera.zoom, 0.05), 10);
   drawMap();
 });
 
+camera.x = isNaN(camera.x) ? 0 : camera.x;
+camera.y = isNaN(camera.y) ? 0 : camera.y;
+camera.zoom = isNaN(camera.zoom) ? 100 : camera.zoom;

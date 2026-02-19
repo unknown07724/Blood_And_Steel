@@ -5,26 +5,7 @@ window.player = {
     diplomacy: {}
 }
 
-window.nation = [
-{
-    name: "Bavaria",
-    ideology: "Monarchist",
-    color: "#2fc4b0",
-    diplomacy: {}
-},
-{
-    name: "Saxony",
-    ideology: "Monarchist",
-    color: "#40b45b",
-    diplomacy: {}
-},
-{
-    name: "Netherlands",
-    ideology: "Monarchist",
-    color: "#705a3e",
-    diplomacy: {}
-}
-]
+window.nations = null;
 
 diplomacymenu = `
 <div class="diplomacy_menu" style="position:fixed; top:0; left:0; background:rgba(90,90,90,1); color:white; padding:10px; border-radius:2px;">
@@ -52,6 +33,12 @@ function parseLang(langString) {
     }
     return dict;
 }
+fetch('nations.json')
+  .then(r => r.json())
+  .then(nations => {
+    window.nations = nations;   // SAVE the fetched data to global
+  })
+  .catch(err => console.error(err));
 
 // --- Translate string using dictionary ---
 function translateString(str, dict) {
@@ -88,9 +75,11 @@ fetch(`languages/${window.language}.lang`)
     peaceBtn = activeDiplomacyMenu.querySelectorAll('button')[1];
   });
 
-  function getNationData(name) {
+function getNationData(name) {
+    if (!window.nation) return null;
     return window.nation.find(n => n.name.toLowerCase() === name.toLowerCase());
 }
+
 
 
 function diplomacy(nationName) {

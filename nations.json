@@ -1,0 +1,32 @@
+[
+{
+    "name": "Bavaria",
+    "ideology": "Monarchist",
+    "color": "#2fc4b0",
+    "diplomacy": {}
+},
+{
+    "name": "Saxony",
+    "ideology": "Monarchist",
+    "color": "#40b45b",
+    "diplomacy": {}
+},
+{
+    "name": "Netherlands",
+    "ideology": "Monarchist",
+    "color": "#705a3e",
+    "diplomacy": {}
+},
+{
+    "name": "Oldenburg",
+    "ideology": "Monarchist",
+    "color": "#9abfce",
+    "diplomacy": {}
+},
+{
+    "name": "Baden",
+    "ideology": "Monarchist",
+    "color": "#5b3d29",
+    "diplomacy": {}
+}
+]
