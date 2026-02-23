@@ -8,12 +8,15 @@ window.player = {
 window.nations = null;
 
 diplomacymenu = `
-<div class="diplomacy_menu" style="position:fixed; top:0; left:0; background:rgba(90,90,90,1); color:white; padding:10px; border-radius:2px;">
-    <img src="Assets/Sprites/Flags/Starting Nations/{$name}/Nonaligned.svg" alt="Flag of {$name}" style="width: 20%; height: 20%; border: 4px ridge #505050;">
-    <p>{$name}</p>
-    <button onclick="alert('Declared War on {$name}')">war</button>
-    <button onclick="">peace</button>
+<div class="diplomacymenu" style="position:fixed;top:0;left:0;background:rgba(90,90,90,1);color:white;padding:10px;border-radius:2px;">
+    <img id="Flag" src="Assets/Sprites/Flags/Starting Nations/${name}/Nonaligned.svg" alt="Flag of ${name}" style="width:20%;height:20%;border:4px ridge #505050;">
+    <p id="diplomacyName">${name}</p>
+    <button id="warBtn">war</button>
+    <button id="peaceBtn">peace</button>
 </div>`;
+
+
+let epoch = new Date(-3471289200 * 1000); // Sunday, January 1, 1860 1:00:00 AM
 
 let activeDiplomacyMenu = null;
 let hoveredProvince = null;
@@ -80,6 +83,7 @@ function getNationData(name) {
     return window.nation.find(n => n.name.toLowerCase() === name.toLowerCase());
 }
 
+activeDiplomacyMenu = document.createElement('div');
 
 
 function diplomacy(nationName) {
@@ -95,19 +99,45 @@ function diplomacy(nationName) {
         flagImg.src = `Assets/Sprites/Flags/Starting Nations/${nationName}/Nonaligned.svg`;
     }
 
-    warBtn.onclick = () => {
-        window.player.diplomacy[nationName.toLowerCase()] = "war";
-        console.log(window.player.ID + " declared war on " + nationName);
-    };
+if (nationName === player.ID) return;
+ warBtn.onclick = () => {
+    const playerNation = window.nations.find(n => n.id === window.player.ID);
+    const targetNation = window.nations.find(n => n.name === nationName);
 
-    peaceBtn.onclick = () => {
-        if (Math.random() < 0.5 && window.player.diplomacy[nationName.toLowerCase()] === "war") {
-            window.player.diplomacy[nationName.toLowerCase()] = "neutral";
-        }
-    };
+    if (!playerNation || !targetNation) return;
+
+    const playerKey = playerNation.name.toLowerCase();
+    const targetKey = targetNation.name.toLowerCase();
+
+    // Declare war both ways
+    playerNation.diplomacy[targetKey] = "war";
+    targetNation.diplomacy[playerKey] = "war";
+
+    console.log(playerNation.name + " declared war on " + targetNation.name);
+};
+
+
+peaceBtn.onclick = () => {
+    const playerNation = window.nations.find(n => n.id === window.player.ID);
+    const targetNation = window.nations.find(n => n.name === nationName);
+
+    if (!playerNation || !targetNation) return;
+
+    const playerKey = playerNation.name.toLowerCase();
+    const targetKey = targetNation.name.toLowerCase();
+
+    if (playerNation.diplomacy[targetKey] === "war" && Math.random() < 0.5) {
+        playerNation.diplomacy[targetKey] = "neutral";
+        targetNation.diplomacy[playerKey] = "neutral";
+    }
+};
+
+
 
     activeDiplomacyMenu.style.display = "block";
 }
+
+
 
 
 window.diplomacy = diplomacy;

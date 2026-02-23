@@ -115,6 +115,4 @@ document.addEventListener('wheel', e => {
   drawMap();
 });
 
-camera.x = isNaN(camera.x) ? 0 : camera.x;
-camera.y = isNaN(camera.y) ? 0 : camera.y;
-camera.zoom = isNaN(camera.zoom) ? 100 : camera.zoom;
+camera.y = -50; camera.zoom = 100

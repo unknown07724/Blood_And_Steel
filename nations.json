@@ -6,6 +6,12 @@
     "diplomacy": {}
 },
 {
+    "name": "Prussia",
+    "ideology": "Monarchist",
+    "color": "#0b4761",
+    "diplomacy": {}
+},
+{
     "name": "Saxony",
     "ideology": "Monarchist",
     "color": "#40b45b",
