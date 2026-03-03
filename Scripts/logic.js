@@ -62,7 +62,6 @@ fetch(`languages/${window.language}.lang`)
         document.title = langDict['title'];
     }
 
-
     // Create menu AFTER translations are ready
     const tempDiv = document.createElement('div');
     tempDiv.innerHTML = translateString(diplomacymenu, langDict);
@@ -79,8 +78,8 @@ fetch(`languages/${window.language}.lang`)
   });
 
 function getNationData(name) {
-    if (!window.nation) return null;
-    return window.nation.find(n => n.name.toLowerCase() === name.toLowerCase());
+    if (!window.nations) return null;
+    return window.nations.find(n => n.name.toLowerCase() === name.toLowerCase());
 }
 
 activeDiplomacyMenu = document.createElement('div');
@@ -99,46 +98,41 @@ function diplomacy(nationName) {
         flagImg.src = `Assets/Sprites/Flags/Starting Nations/${nationName}/Nonaligned.svg`;
     }
 
-if (nationName === player.ID) return;
- warBtn.onclick = () => {
-    const playerNation = window.nations.find(n => n.id === window.player.ID);
-    const targetNation = window.nations.find(n => n.name === nationName);
+    if (nationName === player.ID) return;
+    
+    warBtn.onclick = () => {
+        const playerNation = window.nations.find(n => n.id === window.player.ID);
+        const targetNation = window.nations.find(n => n.name === nationName);
 
-    if (!playerNation || !targetNation) return;
+        if (!playerNation || !targetNation) return;
 
-    const playerKey = playerNation.name.toLowerCase();
-    const targetKey = targetNation.name.toLowerCase();
+        const playerKey = playerNation.name.toLowerCase();
+        const targetKey = targetNation.name.toLowerCase();
 
-    // Declare war both ways
-    playerNation.diplomacy[targetKey] = "war";
-    targetNation.diplomacy[playerKey] = "war";
+        // Declare war both ways
+        playerNation.diplomacy[targetKey] = "war";
+        targetNation.diplomacy[playerKey] = "war";
 
-    console.log(playerNation.name + " declared war on " + targetNation.name);
-};
+        console.log(playerNation.name + " declared war on " + targetNation.name);
+    };
 
+    peaceBtn.onclick = () => {
+        const playerNation = window.nations.find(n => n.id === window.player.ID);
+        const targetNation = window.nations.find(n => n.name === nationName);
 
-peaceBtn.onclick = () => {
-    const playerNation = window.nations.find(n => n.id === window.player.ID);
-    const targetNation = window.nations.find(n => n.name === nationName);
+        if (!playerNation || !targetNation) return;
 
-    if (!playerNation || !targetNation) return;
+        const playerKey = playerNation.name.toLowerCase();
+        const targetKey = targetNation.name.toLowerCase();
 
-    const playerKey = playerNation.name.toLowerCase();
-    const targetKey = targetNation.name.toLowerCase();
-
-    if (playerNation.diplomacy[targetKey] === "war" && Math.random() < 0.5) {
-        playerNation.diplomacy[targetKey] = "neutral";
-        targetNation.diplomacy[playerKey] = "neutral";
-    }
-};
-
-
+        if (playerNation.diplomacy[targetKey] === "war" && Math.random() < 0.5) {
+            playerNation.diplomacy[targetKey] = "neutral";
+            targetNation.diplomacy[playerKey] = "neutral";
+        }
+    };
 
     activeDiplomacyMenu.style.display = "block";
 }
-
-
-
 
 window.diplomacy = diplomacy;
 
@@ -146,27 +140,25 @@ window.diplomacy = diplomacy;
 fetch('provinces.json')
   .then(r => r.json())
   .then(provinces => {
-    const paths = provinces.map(p => ({
-        name: p.name,
-        owner: p.owner,
-        path: new Path2D(p.svg_path),
-        color: getNationData(p.owner)?.color || 'darkgray'
+    // store provinces globally
+    window.provinces = provinces.map(p => ({
+        ...p,
+        color: getNationData(p.owner)?.color || 'darkgray',
+        path: new Path2D(p.svg_path) // keep for hover detection
     }));
 
-board.addEventListener('mousemove', e => {
-    // convert mouse to map coordinates
-    const mouseX = (e.offsetX - board.width/2)/camera.zoom + camera.x;
-    const mouseY = (e.offsetY - board.height/2)/camera.zoom + camera.y;
+    board.addEventListener('mousemove', e => {
+        const mouseX = (e.offsetX - board.width/2)/camera.zoom + camera.x;
+        const mouseY = (e.offsetY - board.height/2)/camera.zoom + camera.y;
 
-    hoveredProvince = null;
-    for (const p of paths) {
-        if (ctx.isPointInPath(p.path, mouseX, mouseY)) {
-            hoveredProvince = p.owner;
-            break;
+        hoveredProvince = null;
+        for (const p of window.provinces) {
+            if (ctx.isPointInPath(p.path, mouseX, mouseY)) {
+                hoveredProvince = p.owner;
+                break;
+            }
         }
-    }
-});
-
+    });
 
     document.addEventListener('keydown', e => {
         if (e.key === 'e' && hoveredProvince) {
