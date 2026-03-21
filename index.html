@@ -18,15 +18,27 @@
         body {
             overflow: hidden; /* Removes both vertical and horizontal scrolling ability */
             font-family: sans-serif;
-    }
+        }
+        .event-box {
+            position: absolute;
+            background-color: rgb(221, 200, 171);
+            border: 1px solid rgb(62, 61, 60);
+            padding: 10px;
+            display: none;
+            font-family: Cambria, Cochin, Georgia, Times, 'Times New Roman', serif;
+            text-align: center;
+        }
 
     </style>
 </head>
 <body>
     <canvas id="board"></canvas>
     <script src="Scripts/logic.js"></script>
+    <script src="Scripts/Armies.js"></script>
     <script src="Scripts/rendering.js"></script>
     <script src="Scripts/Soundtrack.js"></script>
     <script src="Scripts/Date.js"></script>
+    <script src="Scripts/Languages.js"></script>
+
 </body>
 </html>

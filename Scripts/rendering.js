@@ -4,10 +4,6 @@ const ctx = board.getContext('2d');
 board.width = window.innerWidth;
 board.height = window.innerHeight;
 
-/* ===========================
-   GLOBAL STATE
-=========================== */
-
 window.provinces = {}; // single source of truth
 
 let camera = { x: 0, y: 0, zoom: 100 };
@@ -17,9 +13,6 @@ camera.y = isNaN(camera.y) ? 0 : camera.y;
 camera.zoom = isNaN(camera.zoom) ? 100 : camera.zoom;
 
 
-/* ===========================
-   SAFE NATION LOOKUP
-=========================== */
 
 function getNationData(name) {
   if (!window.nations) return null;
@@ -28,10 +21,7 @@ function getNationData(name) {
   );
 }
 
-
-/* ===========================
-   LOAD PROVINCES (ONCE)
-=========================== */
+//loads the provinces
 
 fetch('provinces.json')
   .then(res => res.json())
@@ -41,7 +31,8 @@ fetch('provinces.json')
       window.provinces[p.name] = {
         pathData: p.svg_path,
         path: new Path2D(p.svg_path),
-        owner: p.owner
+        owner: p.owner,
+        center: { x: p.center_x || 0, y: p.center_y || 0 }
       };
     }
 
@@ -51,9 +42,7 @@ fetch('provinces.json')
   .catch(err => console.error(err));
 
 
-/* ===========================
-   CAMERA AUTO-FIT
-=========================== */
+// fits the provinces to camera
 
 function fitCameraToPaths() {
 
@@ -88,10 +77,7 @@ function fitCameraToPaths() {
   camera.zoom = Math.min(scaleX, scaleY) * 0.9;
 }
 
-
-/* ===========================
-   DRAW MAP
-=========================== */
+// does what it says in the name.
 
 function drawMap() {
 
@@ -122,13 +108,12 @@ function drawMap() {
   }
 
   ctx.restore();
+  drawArmies();
 }
 
 
 
-/* ===========================
-   CAMERA CONTROLS
-=========================== */
+//let's the player move the camera
 
 document.addEventListener('keydown', e => {
 
@@ -152,6 +137,36 @@ document.addEventListener('wheel', e => {
   drawMap();
 });
 
+function resetCamera() {
+  camera.y = -50;
+  camera.zoom = 100;
+}
 
-camera.y = -50;
-camera.zoom = 100;
+//renders armies
+function drawArmies() {
+  if (!window.armies) return;
+
+  for (const army of window.armies) {
+    const province = window.provinces[army.location];
+    if (!province || !province.center) continue;
+
+    const nation = getNationData(army.owner);
+    if (!nation) continue;
+
+    const { x, y } = province.center;
+    const size = 15; // scales with zoom
+    ctx.fillStyle = shadeColor(nation.color, 20); // slightly darker
+    ctx.fillRect(x - size/2, y - size/2, size, size);
+  }
+}
+
+// helper: darken color by percent
+function shadeColor(color, percent) {
+  const f=parseInt(color.slice(1),16),t=percent<0?0:255,p=Math.abs(percent)/100,
+        R=f>>16,G=f>>8&0x00FF,B=f&0x0000FF;
+  return "#"+(0x1000000+(
+    Math.round((t-R)*p)+R)*0x10000+
+    (Math.round((t-G)*p)+G)*0x100+
+    (Math.round((t-B)*p)+B)
+  ).toString(16).slice(1);
+}

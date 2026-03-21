@@ -34,5 +34,17 @@
     "ideology": "Monarchist",
     "color": "#5b3d29",
     "diplomacy": {}
+},
+{
+    "name": "Japan",
+    "ideology": "Monarchist",
+    "color": "#c9bfbf",
+    "diplomacy": {}
+},
+{
+    "name": "China",
+    "ideology": "Monarchist",
+    "color": "#3d295b",
+    "diplomacy": {}
 }
 ]

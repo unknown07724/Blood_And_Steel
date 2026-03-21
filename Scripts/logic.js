@@ -6,6 +6,7 @@ window.player = {
 }
 
 window.nations = null;
+armies = [];
 
 diplomacymenu = `
 <div class="diplomacymenu" style="position:fixed;top:0;left:0;background:rgba(90,90,90,1);color:white;padding:10px;border-radius:2px;">
@@ -15,6 +16,17 @@ diplomacymenu = `
     <button id="peaceBtn">peace</button>
 </div>`;
 
+function showEvent(title, description, wait, image) {
+    event_engine = document.createElement('div');
+    event_engine.className = 'event-box';
+    event_engine.innerHTML = `<h1>${title}</h1><img src="${image}" alt="Event Image"><p>${description}</p>`;
+    document.body.appendChild(event_engine);
+    event_engine.style.display = 'block';
+    setTimeout(() => {
+        event_engine.style.display = 'none';
+        document.body.removeChild(event_engine);
+    }, wait * 1000);
+}
 
 let epoch = new Date(-3471289200 * 1000); // Sunday, January 1, 1860 1:00:00 AM
 
@@ -52,6 +64,8 @@ function translateString(str, dict) {
     }
     return translated;
 }
+
+
 
 // --- Load the language and create menu ---
 fetch(`languages/${window.language}.lang`)
@@ -144,7 +158,9 @@ fetch('provinces.json')
     window.provinces = provinces.map(p => ({
         ...p,
         color: getNationData(p.owner)?.color || 'darkgray',
-        path: new Path2D(p.svg_path) // keep for hover detection
+        path: new Path2D(p.svg_path), // keep for hover detection
+        owner: p.owner
+
     }));
 
     board.addEventListener('mousemove', e => {
@@ -166,6 +182,7 @@ fetch('provinces.json')
         }
     });
   });
+
 
 // --- Math ---
 function square(x){
