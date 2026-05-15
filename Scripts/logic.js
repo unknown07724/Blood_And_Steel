@@ -1,9 +1,5 @@
 window.language = 'en';
-
-window.player = {
-    ID: "Prussia",
-    diplomacy: {}
-}
+let warsound = new Audio("Assets/Sounds/SFX/war.wav");
 
 window.nations = null;
 armies = [];
@@ -27,15 +23,6 @@ function showEvent(title, description, wait, image) {
         document.body.removeChild(event_engine);
     }, wait * 1000);
 }
-
-let epoch = new Date(-3471289200 * 1000); // Sunday, January 1, 1860 1:00:00 AM
-
-let activeDiplomacyMenu = null;
-let hoveredProvince = null;
-let langDict = {}; // holds translations
-
-let flagImg, nameP, warBtn, peaceBtn;
-
 // --- Parses Languages ---
 function parseLang(langString) {
     const dict = {};
@@ -96,8 +83,6 @@ function getNationData(name) {
     return window.nations.find(n => n.name.toLowerCase() === name.toLowerCase());
 }
 
-activeDiplomacyMenu = document.createElement('div');
-
 
 function diplomacy(nationName) {
     if (!activeDiplomacyMenu) return;
@@ -128,6 +113,8 @@ function diplomacy(nationName) {
         targetNation.diplomacy[playerKey] = "war";
 
         console.log(playerNation.name + " declared war on " + targetNation.name);
+        warsound.currentTime = 0; // reset to start
+        warsound.play().catch(err => console.error("PLAY ERROR:", err));
     };
 
     peaceBtn.onclick = () => {

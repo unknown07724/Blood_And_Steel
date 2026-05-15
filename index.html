@@ -28,17 +28,64 @@
             font-family: Cambria, Cochin, Georgia, Times, 'Times New Roman', serif;
             text-align: center;
         }
-
+        .main-menu {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgb(34, 67, 118);
+        }
+        .buttons {
+            display: block;
+            margin: auto;
+            width: 25%;
+            height: 50px;
+            background-color: rgb(76, 76, 76);
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;      
+        }
+        button {
+            margin: auto; 
+            display: block;
+            cursor: pointer;
+            color: white;
+            background-color: rgb(169, 168, 168);
+            border: 0cm;
+            width: 30%;
+            height: 25px;
+            margin: 2px;
+        }
+         button:active {
+            background-color: rgb(62, 62, 62);
+        }
     </style>
 </head>
 <body>
+    <script>
+        function setup() {
+            const script = document.createElement("script");
+            script.src = "Scripts/Setup.js";
+            document.body.appendChild(script);        
+        }
+    </script>
+    <div class="main-menu" id="main-menu">
+        <img src="Assets/Sprites/Logo.svg" alt="Logo" style="width: 25.5%; height: auto; margin: auto; display: block;">
+        <div id="buttons" class="buttons">
+            <button id="start" onclick="setup()">Start</button>
+            <button id="settings">Settings</button>
+        </div>
+    </div>
+    <!-- commented for now, will be actually created when nation select done
     <canvas id="board"></canvas>
+    <script src="Scripts/setup.js"></script>
     <script src="Scripts/logic.js"></script>
     <script src="Scripts/Armies.js"></script>
     <script src="Scripts/rendering.js"></script>
     <script src="Scripts/Soundtrack.js"></script>
     <script src="Scripts/Date.js"></script>
-    <script src="Scripts/Languages.js"></script>
-
+    !-->
 </body>
 </html>
